@@ -1,0 +1,23 @@
+# Ignorar build
+/build/
+
+# Ignorar arquivos temporários
+*.obj
+*.o
+*.exe
+*.log
+*.tmp
+
+# Ignorar configurações locais
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Ignorar backups
+*~
+*.bak
+
+# Ignorar arquivos do sistema
+.DS_Store
+Thumbs.db
