@@ -26,7 +26,7 @@ typedef struct
     char lim_adm [128];
     char valoracao [256];
     char data_valoracao [16];
-    char numero_documento [32];
+    char num_doc [32];
     char valor_const_nova [16];
 } dado_excel;
 
