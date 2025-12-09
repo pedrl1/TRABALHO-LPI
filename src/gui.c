@@ -73,3 +73,25 @@ void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados)
     gtk_text_buffer_set_text(buffer, texto, -1);
 }
 
+static void on_file_selected(GtkWidget *widget, gpointer data)
+{
+    GtkTextView *textview = GTK_TEXT_VIEW(data);
+
+    GtkWidget *dialog = gtk_file_chooser_dialog_new(...);
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+        char *pdf_path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+        extract_text(pdf_path); // do pdf_utils.c
+
+        Dadostxt info;
+        if (parse_txt("output/texto.txt", &info)) {
+            update_textview_with_laudo(textview, &info);
+        }
+
+        g_free(pdf_path);
+    }
+
+    gtk_widget_destroy(dialog);
+}
+
