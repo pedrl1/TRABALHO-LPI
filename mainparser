@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include "parser.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+
+char endereco_txt[] = "C:\\DCEXT_C\\textoNovo.txt"; //  substituir pelo endereço real 
+
+
+int main() {
+    #ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8); // imprime acentos corretamente no console
+    SetConsoleCP(CP_UTF8);       // lê teclado e entrada como UTF-8
+    #endif
+
+    FILE *f = fopen(endereco_txt, "r");
+    if (!f) {
+        printf("Erro ao abrir arquivo.\n");
+        return 1;
+    }
+
+    struct Dados Laudo;   // Criar variável
+
+    char linha[500];
+    bool localizado = false;
+
+    // Procura pela linha que contém informações de endereço
+    while (!localizado && fgets(linha, sizeof(linha), f)) {
+        FormatarCaracteres(linha);
+        printf("%s", linha);
+
+        char *p = NULL;
+
+        if ((p = strstr(linha, "Rua ")) != NULL ||              // procurar um endereço
+            (p = strstr(linha, "Avenida ")) != NULL ||
+            (p = strstr(linha, "Rodovia ")) != NULL ||
+            (p = strstr(linha, "Praça ")) != NULL ||
+            (p = strstr(linha, "Alto ")) != NULL) {
+
+            extraiDadosLocalizacao(p, &Laudo);
+            localizado = true;
+        }       
+    }
+
+   
+    // Procura pela linha que contém informações de coordenadas
+    localizado = false;
+    char *p_coord = NULL;
+
+    while (!localizado && fgets(linha, sizeof(linha), f)) {
+        FormatarCaracteres(linha);
+        printf("%s", linha);
+
+        if ((p_coord = strstr(linha, "COORDENADAS:")) != NULL) {
+            extrairCoordenadas(p_coord, &Laudo);
+            localizado = true;
+        }
+    }
+
+    if (!localizado) {
+        strcpy(Laudo.Coordenada_S, "Não encontrado");
+        strcpy(Laudo.Coordenada_W, "Não encontrado");
+}
+
+    
+
+    printf("\n\nLogradouro: %s\n", Laudo.Endereco);
+    printf("Numero: %s\n",   Laudo.Numero);
+    printf("Bairro: %s\n",   Laudo.Bairro);
+    printf("Cidade: %s\n\n\n",   Laudo.Cidade_Municipio);
+
+    printf("Coordenada S: %s\n",   Laudo.Coordenada_S);
+    printf("Coordenada W: %s\n",   Laudo.Coordenada_W);
+
+    fclose(f);
+    return 0;
+}
