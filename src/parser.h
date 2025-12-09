@@ -11,7 +11,6 @@ typedef struct
     char conf_latEsq [256];
     char conf_latDir [256];
     char coords [16];
-    char descricao [512];
     char area_tot [32];
     char area_usada [32];
     char conserv_state [32];

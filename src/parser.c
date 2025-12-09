@@ -107,13 +107,7 @@ void parser_txt (const char *local, dado_excel *out)
             if (pointer = true)
                 strcpy(out -> coords, pointer);
         }
-        else if (strstr(line, "Descrição da edificação"))
-        {
-            const char *pointer = strstr(line, "edificação");
-
-            if (pointer = true)
-                strcpy (out -> desc, pointer);
-        }
+        
         else if (strstr(line, "Área do Terreno:"))
         {
             const char *pointer = dps_doispontos(line);
