@@ -1,13 +1,12 @@
-#include <sdtio.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include "parser.h"
 
-static void corta_fim(char *string)
+static void corta_fim(char *s)
 {
     size_t tam = strlen(s);
-
     while (tam > 0 && (s[tam - 1] == '\n' || s[tam - 1] == '\r'))
         s[--tam] = '\0';
 }
@@ -15,143 +14,125 @@ static void corta_fim(char *string)
 static const char* dps_doispontos(const char *line)
 {
     const char *pointer = strchr(line, ':');
-    if (!pointer) 
+    if (!pointer)
         return NULL;
-    
-    pointer++; 
-
-    while (*pointer == ' ' || *pointer == '\t') 
+    pointer++; /* avança além dos dois pontos */
+    while (*pointer == ' ' || *pointer == '\t')
         pointer++;
     return pointer;
 }
 
-void parser_txt (const char *local, dado_excel *out)
+static void safe_copy(char *dst, size_t dst_size, const char *src)
 {
-    FILE *file = fopen(filepath, "r");
+    if (!dst || dst_size == 0) return;
+    if (!src) {
+        dst[0] = '\0';
+        return;
+    }
+    strncpy(dst, src, dst_size - 1);
+    dst[dst_size - 1] = '\0';
+}
 
-    if (file == false)
+void parser_txt(const char *local, dado_excel *out)
+{
+    if (!local || !out) return;
+
+    FILE *file = fopen(local, "r");
+    if (!file)
     {
-        printf ("ERRO: leitura não finalizada pois arquivo txt não foi aberto no processo de leitura.");
-    } 
+        fprintf(stderr, "ERRO: não foi possível abrir o ficheiro '%s'\n", local);
+        return;
+    }
 
-    char linha[1024];
+    char line[1024];
 
-    strcpy(out->endereco, "não encontrado");
-    strcpy(out->cidade, "não encontrado");
-    strcpy(out->regiao, "não encontrado");
-    strcpy(out->conf_frente, "não encontrado");
-    strcpy(out->conf_fundo, "não encontrado");
-    strcpy(out->conf_latEsq, "não encontrado");
-    strcpy(out->conf_latDir, "não encontrado");
-    strcpy(out->descricao, "não encontrado");
-    strcpy(out->coords, "não encontrado");
+    /* Valores padrão */
+    safe_copy(out->endereco, sizeof(out->endereco), "não encontrado");
+    safe_copy(out->cidade, sizeof(out->cidade), "não encontrado");
+    safe_copy(out->regiao, sizeof(out->regiao), "não encontrado");
+    safe_copy(out->conf_frente, sizeof(out->conf_frente), "não encontrado");
+    safe_copy(out->conf_fundo, sizeof(out->conf_fundo), "não encontrado");
+    safe_copy(out->conf_latEsq, sizeof(out->conf_latEsq), "não encontrado");
+    safe_copy(out->conf_latDir, sizeof(out->conf_latDir), "não encontrado");
+    safe_copy(out->coords, sizeof(out->coords), "não encontrado");
+    safe_copy(out->area_tot, sizeof(out->area_tot), "não encontrado");
+    safe_copy(out->area_usada, sizeof(out->area_usada), "não encontrado");
+    safe_copy(out->conserv_state, sizeof(out->conserv_state), "não encontrado");
+    safe_copy(out->valoracao, sizeof(out->valoracao), "não encontrado");
+    safe_copy(out->data_valoracao, sizeof(out->data_valoracao), "não encontrado");
+    safe_copy(out->CPNo, sizeof(out->CPNo), "não encontrado");
 
-    strcpy(out->area_tot, "não encontrado");
-    strcpy(out->area_usada, "não encontrado");
-    strcpy(out->conserv_state, "não encontrado");
-
-    strcpy(out->valoracao, "não encontrado");
-    strcpy(out->data_valoracao, "não encontrado");
-    strcpy(out->CPNo, "não encontrado");
-
-    while (fgets(line, sizeof(line), f))
+    while (fgets(line, sizeof(line), file))
     {
         corta_fim(line);
 
         if (strstr(line, "LOCALIZAÇÃO:"))
         {
-            const char *pointer = dps_doispontos(line);
-            
-            if (pointer = true) 
-                strcpy(out -> endereco, pointer);
+            const char *p = dps_doispontos(line);
+            if (p) safe_copy(out->endereco, sizeof(out->endereco), p);
         }
         else if (strstr(line, "Mesorregião"))
         {
-            const char *pointer = strstr(line, "Mesorregião");
-
-            if (pointer = true)
-                strcpy(out -> regiao, pointer); 
+            const char *p = strstr(line, "Mesorregião");
+            if (p) safe_copy(out->regiao, sizeof(out->regiao), p);
         }
         else if (strstr(line, "Frente"))
         {
-            const char *pointer = strstr(line, "Frente");
-            
-            if (pointer = true)
-                strcpy(out -> conf_frente, pointer);
+            const char *p = strstr(line, "Frente");
+            if (p) safe_copy(out->conf_frente, sizeof(out->conf_frente), p);
         }
         else if (strstr(line, "Lateral Esquerda"))
         {
-            const char *pointer = strstr(line, "Esquerda");
-            
-            if (pointer = true)
-                strcpy(out -> conf_latEsq, pointer);
+            const char *p = strstr(line, "Esquerda");
+            if (p) safe_copy(out->conf_latEsq, sizeof(out->conf_latEsq), p);
         }
         else if (strstr(line, "Lateral Direita"))
         {
-            const char *pointer = strstr(line, "Direita");
-            
-            if (pointer = true)
-                strcpy(out -> conf_latDir, pointer);
+            const char *p = strstr(line, "Direita");
+            if (p) safe_copy(out->conf_latDir, sizeof(out->conf_latDir), p);
         }
         else if (strstr(line, "Fundo"))
         {
-            const char *pointer = strstr(line, "Fundo");
-            
-            if (pointer = true)
-                strcpy(out -> conf_fundo, pointer);
+            const char *p = strstr(line, "Fundo");
+            if (p) safe_copy(out->conf_fundo, sizeof(out->conf_fundo), p);
         }
         else if (strstr(line, "COORDENADAS:"))
         {
-            const char *pointer = dps_doispontos(line);
-            
-            if (pointer = true)
-                strcpy(out -> coords, pointer);
+            const char *p = dps_doispontos(line);
+            if (p) safe_copy(out->coords, sizeof(out->coords), p);
         }
-        
         else if (strstr(line, "Área do Terreno:"))
         {
-            const char *pointer = dps_doispontos(line);
-
-            if (pointer = true)
-                strcpy (out -> area_tot, pointer);
+            const char *p = dps_doispontos(line);
+            if (p) safe_copy(out->area_tot, sizeof(out->area_tot), p);
         }
         else if (strstr(line, "Área Construída total:"))
         {
-            const char *pointer = dps_doispontos(line);
-
-            if (pointer = true)
-                strcpy (out -> area_usada, pointer);
+            const char *p = dps_doispontos(line);
+            if (p) safe_copy(out->area_usada, sizeof(out->area_usada), p);
         }
         else if (strstr(line, "Estado de conservação (Critério Heidecke)"))
         {
-            const char *pointer = strstr(line, "Heidecke)");
-
-            if (pointer = true)
-                strcpy(out -> conserv_state, pointer);
+            const char *p = strstr(line, "Heidecke");
+            if (p) safe_copy(out->conserv_state, sizeof(out->conserv_state), p);
         }
         else if (strstr(line, "RESULTADO DA AVALIAÇÃO:"))
         {
-            const char *pointer = dps_doispontos(line);
-
-            if (pointer = true)
-                strcpy(out -> valoracao, pointer);
+            const char *p = dps_doispontos(line);
+            if (p) safe_copy(out->valoracao, sizeof(out->valoracao), p);
         }
-        else if (strstr(line, "Recife, "))
+        else if (strstr(line, "Recife,"))
         {
-            const char *pointer = strstr(line, "Recife,");
-
-            if (pointer = true)
-                strcpy(out -> data_valoracao, pointer);
+            const char *p = strstr(line, "Recife,");
+            if (p) safe_copy(out->data_valoracao, sizeof(out->data_valoracao), p);
         }
-        else if (strstr(line, "CP Nº"))
+        else if (strstr(line, "CP Nº") || strstr(line, "CP N") || strstr(line, "CP N°"))
         {
-            const char *pointer = strstr(line, "CP Nº");
-
-            if (pointer = true)
-                strcpy(out -> CPNo, pointer);
+            const char *p = strstr(line, "CP Nº");
+            if (!p) p = strstr(line, "CP N");
+            if (p) safe_copy(out->CPNo, sizeof(out->CPNo), p);
         }
     }
 
     fclose(file);
-
 }
