@@ -1,0 +1,48 @@
+#ifndef PARSER_H
+#define PARSER_H
+
+#include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+struct Dados {
+    char Endereco[100];
+    char Numero[10];
+    char Complemento[60];
+    char Bairro[60];
+    char CEP[10];
+    char Pais[8];
+    char Estado[4];
+    char Cidade_Municipio[30];
+    char Regiao[60];
+    char Conf_frente[100];
+    char Conf_fundo[100];
+    char Conf_L_direita[100];
+    char Conf_L_esquerda[100];
+    char Ponto_referencia[100];
+    char Observacao[300];
+    char Coordenada_S[20];
+    char Coordenada_W[20];
+
+    char A_terreno[30];
+    char A_construida[30];
+    char Unidade_dMedida[20];
+    char Estado_dConservacao[20];
+    char Limitacao_A[100];
+
+    char Criterio_dValor[60];
+    char Data_dValor[12];
+    char N_documento[20];
+    char Valor_construcaoNova[20];
+
+};
+//Funções auxiliares
+void FormatarCaracteres(char *s);
+void RemoveEspaco(char *str);
+void extraiNumero(const char *token_N, char *Numero, size_t tamanho);
+
+//Funções de extração
+void extraiDadosLocalizacao(char *linha, struct Dados *Laudo);
+void extrairCoordenadas(char *p_linha, struct Dados *Laudo);
+
+#endif
