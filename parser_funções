@@ -1,0 +1,191 @@
+#include "parser.h"
+#include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+// Função auxiliar para impedir erros na leitura de caracteres
+void FormatarCaracteres(char *s) {
+    unsigned char *p = (unsigned char *)s;
+    unsigned char *out = (unsigned char *)s;
+
+
+    while (*p) {
+        // EN DASH (–)
+        if (p[0] == 0xE2 && p[1] == 0x80 && p[2] == 0x93) {
+            *out++ = '-';
+            p += 3;
+            continue;
+        }
+
+        // EM DASH (—)
+        if (p[0] == 0xE2 && p[1] == 0x80 && p[2] == 0x94) {
+            *out++ = '-';
+            p += 3;
+            continue;
+        }
+
+        // ASPAS DUPLAS NORMAIS 
+        if (*p == '"') {
+            *out++ = '\'';
+            p++;
+            continue;
+        }
+
+        // ASPAS CURVAS ESQUERDA “  
+        if (p[0] == 0xE2 && p[1] == 0x80 && p[2] == 0x9C) {
+            *out++ = '\'';
+            p += 3;
+            continue;
+        }
+
+        // ASPAS CURVAS DIREITA ”  (E2 80 9D)
+        if (p[0] == 0xE2 && p[1] == 0x80 && p[2] == 0x9D) {
+            *out++ = '\'';
+            p += 3;
+            continue;
+        }
+
+        // ASPAS SIMPLES CURVAS ‘ ’ (E2 80 98 / E2 80 99)
+        if (p[0] == 0xE2 && p[1] == 0x80 &&
+           (p[2] == 0x98 || p[2] == 0x99)) {
+            *out++ = '\'';
+            p += 3;
+            continue;
+        }
+
+        // NBSP (espaço não quebrável)
+        if (*p == 0xC2 && p[1] == 0xA0) {
+            *out++ = ' ';
+            p += 2;
+            continue;
+        }
+
+        // PRIME (′)
+        if (p[0] == 0xE2 && p[1] == 0x80 && p[2] == 0xB2) {
+            *out++ = '\''; p += 3; continue;
+        }
+
+        // DOUBLE PRIME (″)
+        if (p[0] == 0xE2 && p[1] == 0x80 && p[2] == 0xB3) {
+            *out++ = '\''; p += 3; continue;
+        }
+
+
+        // padrão — copiar byte normal
+        *out++ = *p++;
+    }
+    *out = '\0';
+}
+
+// Função auxiliar para remover espaços extras no início e fim
+void RemoveEspaco(char *str) {
+    char *inicio = str;
+    char *fim;
+    
+    while(isspace((unsigned char)*inicio)) inicio++;                              // Remove espaços no início
+    if(*inicio == 0) {
+        *str = '\0';
+        return;                                                                   // Caso string seja vazia                                          
+    }
+    
+    fim = inicio + strlen(inicio) - 1;                                            
+    while(fim > inicio && isspace((unsigned char)*fim)) fim--;                 // Remove espaços no fim
+    *(fim+1) = '\0';
+
+    memmove(str, inicio, (size_t)(fim - inicio + 2));                                    // Altera o início do buffer
+}
+
+void extraiNumero(const char *token_N, char *Numero, size_t tamanho) {
+    size_t j = 0;
+
+    for (size_t i = 0; token_N[i] != '\0' && j < tamanho - 1; i++) {
+        if (isdigit((unsigned char)token_N[i])) {
+            Numero[j++] = token_N[i];
+        }
+    }
+
+    if (j == 0) {
+        // Nenhum dígito encontrado
+        strncpy(Numero, "S/N", tamanho - 1);
+        Numero[tamanho - 1] = '\0';
+    } else {
+        Numero[j] = '\0'; // Finaliza string
+    }
+}
+
+void extraiDadosLocalizacao(char *p_linha, struct Dados *Laudo) {
+
+    char *token = strtok(p_linha, ",-");
+    RemoveEspaco(token);                
+    strncpy(Laudo->Endereco, token, sizeof(Laudo->Endereco)-1);
+    Laudo->Endereco[sizeof(Laudo->Endereco)-1] = '\0';
+    int j = 0;
+
+    while(token != NULL) {
+        RemoveEspaco(token);
+
+        if(j == 1) {
+            extraiNumero(token, Laudo->Numero, sizeof(Laudo->Numero));
+        }
+        else if(j == 2) {
+            strncpy(Laudo->Bairro, token, sizeof(Laudo->Bairro)-1);
+            Laudo->Bairro[sizeof(Laudo->Bairro)-1] = '\0';
+        }
+        else if(j == 3) {
+            strncpy(Laudo->Cidade_Municipio, token, sizeof(Laudo->Cidade_Municipio)-1);
+            Laudo->Cidade_Municipio[sizeof(Laudo->Cidade_Municipio)-1] = '\0';
+        }
+
+        token = strtok(NULL, ",-");
+        j++;
+    }   
+}
+
+void extrairCoordenadas(char *p_linha, struct Dados *Laudo) {
+    char *inicio = strchr(p_linha, ':');
+    if (!inicio) return;
+
+    inicio++;                   // pula ':'
+    RemoveEspaco(inicio);       // remove espaços à esquerda
+
+    // acha o primeiro dígito (início da coordenada S)
+    char *iniS = inicio;
+    while (*iniS && !isdigit((unsigned char)*iniS)) iniS++;
+    if (!*iniS) return;
+
+    // acha o 'S'
+    char *fimS = strchr(iniS, 'S');
+    if (!fimS) fimS = strchr(iniS, 's');
+    if (!fimS) return;
+
+    
+    size_t tamS = (size_t)(fimS - iniS);
+    if (tamS >= sizeof(Laudo->Coordenada_S))    // medida anti overflow
+        tamS = sizeof(Laudo->Coordenada_S) - 1;
+
+    // copia coordenada S
+    strncpy(Laudo->Coordenada_S, iniS, tamS);
+    Laudo->Coordenada_S[tamS] = '\0';
+    RemoveEspaco(Laudo->Coordenada_S);
+
+    // --- W ---
+    char *iniW = fimS + 1;
+    RemoveEspaco(iniW);
+
+    // acha o primeiro dígito (início da coordenada W)
+    while (*iniW && !isdigit((unsigned char)*iniW)) iniW++;
+    if (!*iniW) return;
+
+    char *fimW = strchr(iniW, 'W');
+    if (!fimW) fimW = strchr(iniW, 'w');
+    if (!fimW) return;
+
+    size_t tamW = (size_t)(fimW - iniW);
+    if (tamW >= sizeof(Laudo->Coordenada_W))    // medida anti overflow
+        tamW = sizeof(Laudo->Coordenada_W) - 1;
+
+    // copia coordenada W
+    strncpy(Laudo->Coordenada_W, iniW, tamW);
+    Laudo->Coordenada_W[tamW] = '\0';
+    RemoveEspaco(Laudo->Coordenada_W);
+}
