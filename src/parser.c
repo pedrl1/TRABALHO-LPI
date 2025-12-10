@@ -163,25 +163,33 @@ void parser_txt(const char *local, dado_excel *out)
             const char *p = strstr(line, "Mesorregião");
             if (p) safe_copy(out->regiao, sizeof(out->regiao), p);
         }
-        else if (strstr(line, "Frente"))
-        {
-            const char *p = strstr(line, "Frente");
-            if (p) safe_copy(out->conf_frente, sizeof(out->conf_frente), p);
-        }
-        else if (strstr(line, "Lateral Esquerda"))
-        {
-            const char *p = strstr(line, "Esquerda");
-            if (p) safe_copy(out->conf_latEsq, sizeof(out->conf_latEsq), p);
-        }
-        else if (strstr(line, "Lateral Direita"))
-        {
-            const char *p = strstr(line, "Direita");
-            if (p) safe_copy(out->conf_latDir, sizeof(out->conf_latDir), p);
-        }
-        else if (strstr(line, "Fundo"))
-        {
-            const char *p = strstr(line, "Fundo");
-            if (p) safe_copy(out->conf_fundo, sizeof(out->conf_fundo), p);
+        // nova forma de extração de confrontantes
+        else if (strstr(line, "CONFRONTANTES")){
+            const char *p_fr, *p_e, *p_d, *p_fu;  // ponteiros para cada confrantante
+            for (size_t j = 0; j < 5; j++){       // confrantantes geralmente se encontram nas próximas 5 linhas
+            
+                fgets(line, sizeof(line), file);  
+                if (strstr(line, "Frente"))
+                { 
+                    p_fr = dps_str(line, "Frente");
+                    if (p_fr) safe_copy(out->conf_frente, sizeof(out->conf_frente), p_fr);
+                }
+                else if (strstr(line, "Lateral Esquerda"))
+                { 
+                    p_e = dps_str(line, "Esquerda");
+                    if (p_e) safe_copy(out->conf_latEsq, sizeof(out->conf_latEsq), p_e);                                  
+                }
+                else if (strstr(line, "Lateral Direita"))
+                { 
+                    p_d = dps_str(line, "Direita");
+                    if (p_d) safe_copy(out->conf_latDir, sizeof(out->conf_latDir), p_d);
+                }
+                else if (strstr(line, "Fundos"))
+                { 
+                    p_fu = dps_str(line, "Fundos");
+                    if (p_fu) safe_copy(out->conf_fundo, sizeof(out->conf_fundo), p_fu);
+                }
+            }
         }
         else if (strstr(line, "COORDENADAS:"))
         {
