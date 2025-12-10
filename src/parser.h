@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+//struct com variáveis para colocar os dados necessários pro excel  
 typedef struct DadosTxt
 {
     char endereco [256];

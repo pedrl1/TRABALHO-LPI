@@ -4,6 +4,6 @@
 #include <stdbool.h>
 #include "parser.h"
 
-bool criar_excel(const char *caminho, const Dadostxt *d);
+bool criar_excel(const char *caminho, const Dadostxt *dado);
 
 #endif

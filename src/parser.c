@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "parser.h"
 
+// função que corta o fim do parser (quando pula linha)
 static void corta_fim(char *s)
 {
     size_t tam = strlen(s);
@@ -11,6 +12,7 @@ static void corta_fim(char *s)
         s[--tam] = '\0';
 }
 
+// função que faz ele ler depois dos dois pontos (ele ignora os dois pontos após a palavra que ele identifica como igual para que o parser leia tudo após ela)
 static const char* dps_doispontos(const char *line)
 {
     const char *pointer = strchr(line, ':');
@@ -33,6 +35,7 @@ static void safe_copy(char *dst, size_t dst_size, const char *src)
     dst[dst_size - 1] = '\0';
 }
 
+//função principal do parser
 void parser_txt(const char *local, dado_excel *out)
 {
     if (!local || !out) return;

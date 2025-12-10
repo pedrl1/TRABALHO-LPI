@@ -17,7 +17,7 @@ void extract_text(const char *pdf_path, const char *output_path) {
     // Executa o comando
     int r = system(cmd);
     if (r != 0) {
-        g_print("[ERROR] Falha ao executar pdftotext\n");
+        g_print("[ERRO] Falha ao executar pdftotext\n");
     } else {
         g_print("[OK] Texto extraído com sucesso para %s\n", output_path);
     }

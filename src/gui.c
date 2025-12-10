@@ -5,7 +5,7 @@
 #include "excel_utils.h"
 #include "parser.h"
 
-// Atualiza o TextView com os dados extraídos
+// Atualiza o TextView com os dados extraídos pelo parser
 void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados) 
 {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(textview);
@@ -34,7 +34,7 @@ void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados)
     gtk_text_buffer_set_text(buffer, texto, -1);
 }
 
-// Callback para o botão "Escolher PDF"
+//Função que faz o botão de selecionar arquivo funcionar quando clicado
 static void on_button_clicked(GtkButton *button, gpointer user_data) 
 {
     GtkWidget **widgets = (GtkWidget **)user_data;
@@ -68,9 +68,9 @@ static void on_button_clicked(GtkButton *button, gpointer user_data)
         parser_txt("texto.txt", &dados);
 
         if (criar_excel("laudo.xlsx", &dados)) {
-            g_print("Excel criado com sucesso em build/laudo.xlsx\n");
+            g_print("Planilha criada com sucesso em build/laudo.xlsx\n");
         } else {
-            g_print("Erro ao gerar Excel!\n");
+            g_print("Erro ao gerar planilha...\n");
         }
 
         // Atualiza a GUI
@@ -82,31 +82,29 @@ static void on_button_clicked(GtkButton *button, gpointer user_data)
     gtk_widget_destroy(dialog);
 }
 
-// Inicializa a GUI
+// Outra função autoexplicativa (inicia o GUI)
 void init_gui(int *argc, char ***argv) 
 {
     gtk_init(argc, argv);
 
-    // Janela principal
+    // Cria a janela principal
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "SAD Extractor");
     gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
 
-    // Box vertical
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
-    // TextView para exibir os resultados
+    // Função que exibe os resultados
     GtkWidget *textview = gtk_text_view_new();
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textview), GTK_WRAP_WORD);
     gtk_widget_set_vexpand(textview, TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), textview, TRUE, TRUE, 0);
 
-    // Botão para selecionar PDF
+    // Aqui cria o botão de selecionar pdf (visualmente)
     GtkWidget *button = gtk_button_new_with_label("Escolher PDF");
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
 
-    // Passando ponteiros para a callback
     GtkWidget *widgets[2] = { window, textview };
     g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), widgets);
 
