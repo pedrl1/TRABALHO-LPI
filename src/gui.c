@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pdf_utils.h"
+#include "excel_utils.h"
 #include "parser.h"
 
 // Atualiza o TextView com os dados extraídos
@@ -65,6 +66,12 @@ static void on_button_clicked(GtkButton *button, gpointer user_data)
         // Parser do TXT
         Dadostxt dados;
         parser_txt("texto.txt", &dados);
+
+        if (criar_excel("laudo.xlsx", &dados)) {
+            g_print("Excel criado com sucesso em build/laudo.xlsx\n");
+        } else {
+            g_print("Erro ao gerar Excel!\n");
+        }
 
         // Atualiza a GUI
         update_textview_with_laudo(textview, &dados);
