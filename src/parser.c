@@ -50,6 +50,19 @@ static void corta_fim(char *s)
         s[--tam] = '\0';
 }
 
+//-------------------------------------------------------------------------//
+static const char* dps_str(const char *line, const char *substr)
+{
+    const char *pointer = strstr(line, substr);
+    if (!pointer)
+        return NULL;
+    pointer += strlen(substr); /* avança além da substring */
+    while (*pointer == ' ' || *pointer == '\t')
+        pointer++;
+    return pointer;
+}
+//-------------------------------------------------------------------------//
+
 static const char* dps_doispontos(const char *line)
 {
     const char *pointer = strchr(line, ':');
