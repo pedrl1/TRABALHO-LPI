@@ -4,7 +4,10 @@
 #include <stdbool.h>
 #include "parser.h"
 
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  FUNÇÕES AUXILIARES  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+
 //---------------------------------------------------------------------------------------------------------------//
+// função que "pula" todos os espaços em branco que ocorrerem após uma string que for definida como parâmetro
 static void remove_espaco(char *str) {
     char *start = str;
     char *end;
@@ -21,28 +24,9 @@ static void remove_espaco(char *str) {
 
     memmove(str, start, (size_t)(end - start + 2));                           // Altera o início do buffer
 }
-
-static void extrainumero(const char *token_N, char *numero, size_t tam) {
-    size_t j = 0;
-
-    for (size_t i = 0; token_N[i] != '\0' && j < tam - 1; i++) {
-        if (isdigit((unsigned char)token_N[i])) {
-            numero[j++] = token_N[i];
-        }
-    }
-
-    if (j == 0) {
-        // Nenhum dígito encontrado
-        strncpy(numero, "não encontrado", tam - 1);
-        numero[tam - 1] = '\0';
-    } else {
-        numero[j] = '\0'; // Finaliza string
-    }
-}
-
 //---------------------------------------------------------------------------------------------------------------//
 
-
+// função que corta o fim do parser (quando pula linha)
 static void corta_fim(char *s)
 {
     size_t tam = strlen(s);
@@ -51,6 +35,7 @@ static void corta_fim(char *s)
 }
 
 //-------------------------------------------------------------------------//
+// função que retorna o ponteiro para a primeira ocorrência de um caractere, diferente de espaço ou tabulação, que aparece em uma linha após a string que for definida como parâmetro
 static const char* dps_str(const char *line, const char *substr)
 {
     const char *pointer = strstr(line, substr);
@@ -63,6 +48,7 @@ static const char* dps_str(const char *line, const char *substr)
 }
 //-------------------------------------------------------------------------//
 
+// função que faz ele ler depois dos dois pontos (ele ignora os dois pontos após a palavra que ele identifica como igual para que o parser leia tudo após ela)
 static const char* dps_doispontos(const char *line)
 {
     const char *pointer = strchr(line, ':');
@@ -85,17 +71,38 @@ static void safe_copy(char *dst, size_t dst_size, const char *src)
     dst[dst_size - 1] = '\0';
 }
 
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  FUNÇÕES DE EXTRAÇÃO  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
 
 //-------------------------------------------------------------------------//
+// função que filtra e altera o que está armazenado numa string, deixando apenas os números e ignorando qualquer outra forma de caractere.
+static void extrainumero(const char *token_N, char *numero, size_t tam) {
+    size_t j = 0;
+
+    for (size_t i = 0; token_N[i] != '\0' && j < tam - 1; i++) {
+        if (isdigit((unsigned char)token_N[i])) {
+            numero[j++] = token_N[i];
+        }
+    }
+
+    if (j == 0) {
+        // Nenhum dígito encontrado
+        strncpy(numero, "não encontrado", tam - 1);
+        numero[tam - 1] = '\0';
+    } else {
+        numero[j] = '\0'; // Finaliza string
+    }
+}
+
+// função que extrai o logradouro, número, bairro e cidade (ou município) contidos numa linha (que está dividida em vírgulas ou hífens)
 void extraiDadosLocalizacao(char *p_linha, dado_excel *dado_l) { 
 
-    char *token = strtok(p_linha, ",-");
+    char *token = strtok(p_linha, ",-");    // separa a linha em tokens (ou partições), dividos por vírgula ou hífen
     RemoveEspaco(token);                
     safe_copy(dado_l->endereco, sizeof(dado_l->endereco), token);
 
-    int j = 0;
+    int j = 0;    // cada índice de "j" indica um token diferente
 
-    while(token != NULL) {
+    while(token != NULL) {    
         RemoveEspaco(token);
 
         if(j == 1) {
@@ -118,6 +125,7 @@ void extraiDadosLocalizacao(char *p_linha, dado_excel *dado_l) {
 //-------------------------------------------------------------------------//
 
 
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  FUNÇÃO PRINCIPAL DO PARSER  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
 void parser_txt(const char *local, dado_excel *out)
 {
     if (!local || !out) return;
@@ -168,10 +176,10 @@ void parser_txt(const char *local, dado_excel *out)
             const char *p_fr, *p_e, *p_d, *p_fu;  // ponteiros para cada confrantante
             for (size_t j = 0; j < 5; j++){       // confrantantes geralmente se encontram nas próximas 5 linhas
             
-                fgets(line, sizeof(line), file);  
+                fgets(line, sizeof(line), file);     
                 if (strstr(line, "Frente"))
                 { 
-                    p_fr = dps_str(line, "Frente");
+                    p_fr = dps_str(line, "Frente");    // uso da função dps_str para não levar os espaços do ínicio em conta na hora de adquirir o confrontante
                     if (p_fr) safe_copy(out->conf_frente, sizeof(out->conf_frente), p_fr);
                 }
                 else if (strstr(line, "Lateral Esquerda"))
