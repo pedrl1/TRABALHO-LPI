@@ -36,9 +36,9 @@ static void corta_fim(char *s)
 
 //-------------------------------------------------------------------------//
 // função que retorna o ponteiro para a primeira ocorrência de um caractere, diferente de espaço ou tabulação, que aparece em uma linha após a string que for definida como parâmetro
-static const char* dps_str(const char *line, const char *substr)
+static char* dps_str(char *line, char *substr)
 {
-    const char *pointer = strstr(line, substr);
+    char *pointer = strstr(line, substr);
     if (!pointer)
         return NULL;
     pointer += strlen(substr); /* avança além da substring */
@@ -49,9 +49,9 @@ static const char* dps_str(const char *line, const char *substr)
 //-------------------------------------------------------------------------//
 
 // função que faz ele ler depois dos dois pontos (ele ignora os dois pontos após a palavra que ele identifica como igual para que o parser leia tudo após ela)
-static const char* dps_doispontos(const char *line)
+static char* dps_doispontos(char *line)
 {
-    const char *pointer = strchr(line, ':');
+    char *pointer = strchr(line, ':');
     if (!pointer)
         return NULL;
     pointer++; /* avança além dos dois pontos */
@@ -60,7 +60,7 @@ static const char* dps_doispontos(const char *line)
     return pointer;
 }
 
-static void safe_copy(char *dst, size_t dst_size, const char *src)
+static void safe_copy(char *dst, size_t dst_size, char *src)
 {
     if (!dst || dst_size == 0) return;
     if (!src) {
@@ -75,7 +75,7 @@ static void safe_copy(char *dst, size_t dst_size, const char *src)
 
 //-------------------------------------------------------------------------//
 // função que filtra e altera o que está armazenado numa string, deixando apenas os números e ignorando qualquer outra forma de caractere.
-static void extrainumero(const char *token_N, char *numero, size_t tam) {
+static void extrainumero(char *token_N, char *numero, size_t tam) {
     size_t j = 0;
 
     for (size_t i = 0; token_N[i] != '\0' && j < tam - 1; i++) {
@@ -94,16 +94,16 @@ static void extrainumero(const char *token_N, char *numero, size_t tam) {
 }
 
 // função que extrai o logradouro, número, bairro e cidade (ou município) contidos numa linha (que está dividida em vírgulas ou hífens)
-void extraiDadosLocalizacao(char *p_linha, dado_excel *dado_l) { 
+void extrai_dados_localizacao(char *p_linha, dado_excel *dado_l) { 
 
     char *token = strtok(p_linha, ",-");    // separa a linha em tokens (ou partições), dividos por vírgula ou hífen
-    RemoveEspaco(token);                
+    remove_espaco(token);                
     safe_copy(dado_l->endereco, sizeof(dado_l->endereco), token);
 
     int j = 0;    // cada índice de "j" indica um token diferente
 
     while(token != NULL) {    
-        RemoveEspaco(token);
+        remove_espaco(token);
 
         if(j == 1) {
             extrainumero(token, dado_l->numero, sizeof(dado_l->numero));
@@ -126,7 +126,7 @@ void extraiDadosLocalizacao(char *p_linha, dado_excel *dado_l) {
 
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  FUNÇÃO PRINCIPAL DO PARSER  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
-void parser_txt(const char *local, dado_excel *out)
+void parser_txt(char *local, dado_excel *out)
 {
     if (!local || !out) return;
 
@@ -163,20 +163,22 @@ void parser_txt(const char *local, dado_excel *out)
 
         if (strstr(line, "LOCALIZAÇÃO:"))
         {
-            const char *p = dps_doispontos(line);
-            if (p) extraiDadosLocalizacao(p, out->endereco);    // --Safe_Copy substítuido por função extrai dados               
+            char *p = dps_doispontos(line);
+            if (p) extrai_dados_localizacao(p, out);    // --Safe_Copy substítuido por função extrai dadoteste               
         }
         else if (strstr(line, "Mesorregião"))
         {
-            const char *p = strstr(line, "Mesorregião");
+            char *p = strstr(line, "Mesorregião");
             if (p) safe_copy(out->regiao, sizeof(out->regiao), p);
         }
         // nova forma de extração de confrontantes
         else if (strstr(line, "CONFRONTANTES")){
-            const char *p_fr, *p_e, *p_d, *p_fu;  // ponteiros para cada confrantante
+            char *p_fr, *p_e, *p_d, *p_fu;  // ponteiros para cada confrantante
             for (size_t j = 0; j < 5; j++){       // confrantantes geralmente se encontram nas próximas 5 linhas
             
-                fgets(line, sizeof(line), file);     
+                fgets(line, sizeof(line), file);
+                corta_fim(line);
+
                 if (strstr(line, "Frente"))
                 { 
                     p_fr = dps_str(line, "Frente");    // uso da função dps_str para não levar os espaços do ínicio em conta na hora de adquirir o confrontante
@@ -201,37 +203,37 @@ void parser_txt(const char *local, dado_excel *out)
         }
         else if (strstr(line, "COORDENADAS:"))
         {
-            const char *p = dps_doispontos(line);
+            char *p = dps_doispontos(line);
             if (p) safe_copy(out->coords, sizeof(out->coords), p);
         }
         else if (strstr(line, "Área do Terreno:"))
         {
-            const char *p = dps_doispontos(line);
+            char *p = dps_doispontos(line);
             if (p) safe_copy(out->area_tot, sizeof(out->area_tot), p);
         }
         else if (strstr(line, "Área Construída total:"))
         {
-            const char *p = dps_doispontos(line);
+            char *p = dps_doispontos(line);
             if (p) safe_copy(out->area_usada, sizeof(out->area_usada), p);
         }
         else if (strstr(line, "Estado de conservação (Critério Heidecke)"))
         {
-            const char *p = strstr(line, "Heidecke");
+            char *p = strstr(line, "Heidecke");
             if (p) safe_copy(out->conserv_state, sizeof(out->conserv_state), p);
         }
         else if (strstr(line, "RESULTADO DA AVALIAÇÃO:"))
         {
-            const char *p = dps_doispontos(line);
+            char *p = dps_doispontos(line);
             if (p) safe_copy(out->valoracao, sizeof(out->valoracao), p);
         }
         else if (strstr(line, "Recife,"))
         {
-            const char *p = strstr(line, "Recife,");
+            char *p = strstr(line, "Recife,");
             if (p) safe_copy(out->data_valoracao, sizeof(out->data_valoracao), p);
         }
         else if (strstr(line, "CP Nº") || strstr(line, "CP N") || strstr(line, "CP N°"))
         {
-            const char *p = strstr(line, "CP Nº");
+            char *p = strstr(line, "CP Nº");
             if (!p) p = strstr(line, "CP N");
             if (p) safe_copy(out->CPNo, sizeof(out->CPNo), p);
         }
