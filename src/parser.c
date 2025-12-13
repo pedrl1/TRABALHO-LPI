@@ -218,10 +218,10 @@ void parser_txt(char *local, dado_excel *out)
         }
         else if (strstr(line, "Estado de conservação (Critério Heidecke)"))
         {
-            char *p = strstr(line, "Heidecke");
+            char *p = strstr(line, " anos");
             if (p) safe_copy(out->conserv_state, sizeof(out->conserv_state), p);
         }
-        else if (strstr(line, "RESULTADO DA AVALIAÇÃO:"))
+        else if (strstr(line, "AVALIAÇÃO:"))
         {
             char *p = dps_doispontos(line);
             if (p) safe_copy(out->valoracao, sizeof(out->valoracao), p);
