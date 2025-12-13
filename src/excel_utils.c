@@ -11,49 +11,55 @@ bool criar_excel(const char *caminho, const Dadostxt *dado)
 
     lxw_worksheet *sheet = workbook_add_worksheet(workbook, "Dados");
 
-    int row = 0;
+    int collumn = 0;
 
-    worksheet_write_string(sheet, row, 0, "Endereço:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->endereco, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Endereço:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->endereco, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Cidade:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->cidade, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Número:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->numero, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Região:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->regiao, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Cidade:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->cidade, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Frente:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->conf_frente, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Estado:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->estado, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Fundo:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->conf_fundo, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Região:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->regiao, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Lateral Esquerda:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->conf_latEsq, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Frente:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->conf_frente, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Lateral Direita:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->conf_latDir, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Fundo:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->conf_fundo, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Coordenadas:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->coords, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Lateral Esquerda:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->conf_latEsq, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Área Total:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->area_tot, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Lateral Direita:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->conf_latDir, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Área Construída:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->area_usada, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Coordenadas:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->coords, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Estado de Conservação:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->conserv_state, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Área Total:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->area_tot, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Valoração:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->valoracao, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Área Construída:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->area_usada, NULL);
 
-    worksheet_write_string(sheet, row, 0, "Data Valoração:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->data_valoracao, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Estado de Conservação:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->conserv_state, NULL);
 
-    worksheet_write_string(sheet, row, 0, "CP Nº:", NULL);
-    worksheet_write_string(sheet, row++, 1, dado->CPNo, NULL);
+    worksheet_write_string(sheet, 0, collumn, "Valoração:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->valoracao, NULL);
+
+    worksheet_write_string(sheet, 0, collumn, "Data Valoração:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->data_valoracao, NULL);
+
+    worksheet_write_string(sheet, 0, collumn, "CP Nº:", NULL);
+    worksheet_write_string(sheet, 1, collumn++, dado->CPNo, NULL);
 
     workbook_close(workbook);
 

@@ -9,6 +9,8 @@ Projeto em C que extrai informações chave de PDF's de patrimônios e as organi
 - CMake
 - MinGW64
 - Zlib (`pacman -S mingw-w64-x86_64-zlib`)
+- Gtk 3.0
+- pdftotext (Poppler lib)
 
 ### Compilação
 ```bash

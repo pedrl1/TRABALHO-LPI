@@ -13,6 +13,9 @@ void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados)
     char texto[4096];
     snprintf(texto, sizeof(texto),
         "Endereço: %s\n"
+        "Número: %s\n"
+        "Cidade: %s\n"
+        "Estado: %s\n"
         "Região: %s\n" 
         "Confrontante Frente: %s\n" 
         "Confrontante Fundo: %s\n" 
@@ -25,7 +28,7 @@ void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados)
         "Valoração: %s\n"
         "Data da valoração: %s\n"
         "CP Nº: %s\n",
-        dados->endereco, dados->regiao, dados->conf_frente, dados->conf_fundo,
+        dados->endereco, dados->numero, dados->cidade, dados->estado, dados->regiao, dados->conf_frente, dados->conf_fundo,
         dados->conf_latEsq, dados->conf_latDir, dados->coords,
         dados->area_tot, dados->area_usada, dados->conserv_state,
         dados->valoracao, dados->data_valoracao, dados->CPNo

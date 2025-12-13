@@ -1,11 +1,12 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-//struct com variáveis para colocar os dados necessários pro excel  
 typedef struct DadosTxt
 {
     char endereco [256];
-    char cidade [32];
+    char numero [32];   
+    char cidade [32];   
+    char estado [32];   
     char regiao [32];
     char conf_frente [256];
     char conf_fundo [256];
@@ -22,6 +23,8 @@ typedef struct DadosTxt
 
 typedef Dadostxt dado_excel;
 
-void parser_txt(const char *local, dado_excel *out);
+void extrai_dados_localizacao(char *p_linha, dado_excel *dado_l); //--Função que extrai endereço, número, bairro e cidade.
+
+void parser_txt(char *local, dado_excel *out);
 
 #endif
