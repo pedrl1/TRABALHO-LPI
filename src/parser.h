@@ -23,7 +23,7 @@ typedef struct DadosTxt
 
 typedef Dadostxt dado_excel;
 
-void extraiDadosLocalizacao(char *p_linha, dado_excel *dado_l); //--Função que extrai endereço, número, bairro e cidade.
+void extrai_dados_localizacao(char *p_linha, dado_excel *dado_l); //--Função que extrai endereço, número, bairro e cidade.
 
 void parser_txt(const char *local, dado_excel *out);
 
