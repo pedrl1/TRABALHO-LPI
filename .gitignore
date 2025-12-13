@@ -1,13 +1,27 @@
 # Binários
 *.exe
 *.o
+*.obj
 
 # Arquivos de entrada/saída
 *.pdf
 *.txt
+*.log
+*.tmp
+
+# Build / CMake
+/build/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
 
 # Sistema / editor
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Backups
+*~
+*.bak
 
