@@ -1,0 +1,13 @@
+# Binários
+*.exe
+*.o
+
+# Arquivos de entrada/saída
+*.pdf
+*.txt
+
+# Sistema / editor
+.vscode/
+.DS_Store
+Thumbs.db
+
