@@ -258,10 +258,21 @@ void parser_txt(char *local, dado_excel *out)
             char *p = dps_doispontos(line);
             if (p) safe_copy(out->area_usada, sizeof(out->area_usada), p);
         }
-        else if (strstr(line, "Estado de conservação (Critério Heidecke)"))
+        else if (strstr(line, "Estado de conservação")) // nova forma de adquirir estado de conservação
         {
-            char *p = strstr(line, "Heidecke");
-            if (p) safe_copy(out->conserv_state, sizeof(out->conserv_state), p);
+            char *p;
+            for (size_t j = 0; j < 5; j++){       // estado de conervação pode ser encontrado nas próximas 5 linhas
+            
+                fgets(line, sizeof(line), file);
+                corta_fim(line);
+
+                if (strstr(line, "anos"))                                                // se a string "anos" estiver em uma das 5 linhas lidas
+                {                                                                        // tudo o que estiver depois de "anos" será copiado para
+                    p = dps_str(line, "anos");                                           // o estado de conservação
+                    if (p) safe_copy(out->conserv_state, sizeof(out->conserv_state), p);
+                    
+                }
+            }
         }
         else if (strstr(line, "RESULTADO DA AVALIAÇÃO:"))
         {
