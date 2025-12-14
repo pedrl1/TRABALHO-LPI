@@ -12,7 +12,8 @@ typedef struct DadosTxt
     char conf_fundo [256];
     char conf_latEsq [256];
     char conf_latDir [256];
-    char coords [64];
+    char coord_S [20];  // --nova variavel
+    char coord_W [20];  // --nova variavel
     char area_tot [32];
     char area_usada [32];
     char conserv_state [32];
@@ -24,6 +25,7 @@ typedef struct DadosTxt
 typedef Dadostxt dado_excel;
 
 void extrai_dados_localizacao(char *p_linha, dado_excel *dado_l); //--Função que extrai endereço, número, bairro e cidade.
+void extrai_coordenadas(char *p_linha, dado_excel *dado_c); //--Função que extrai as coordenadas S e W.
 
 void parser_txt(const char *local, dado_excel *out);
 
