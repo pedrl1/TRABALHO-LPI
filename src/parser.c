@@ -94,9 +94,9 @@ static void extrainumero(char *token_N, char *numero, size_t tam) {
 }
 
 // função que extrai o logradouro, número, bairro e cidade (ou município) contidos numa linha (que está dividida em vírgulas ou hífens)
-void extrai_dados_localizacao(char *p_linha, dado_excel *dado_l) { 
+void extrai_dados_localizacao(char *p_line, dado_excel *dado_l) { 
 
-    char *token = strtok(p_linha, ",-");    // separa a linha em tokens (ou partições), dividos por vírgula ou hífen
+    char *token = strtok(p_line, ",-");    // separa a linha em tokens (ou partições), dividos por vírgula ou hífen
     remove_espaco(token);                
     safe_copy(dado_l->endereco, sizeof(dado_l->endereco), token);
 
@@ -121,6 +121,47 @@ void extrai_dados_localizacao(char *p_linha, dado_excel *dado_l) {
         token = strtok(NULL, ",-");
         j++;
     }   
+}
+
+// função que extrai as coordenadas S e W, que estão contidas na linha que recebeu de parâmetro
+void extrai_coordenadas(char *p_line, dado_excel *dado_c) {
+    char *S_start = p_line;
+    
+    // acha o 'S'
+    char *S_end = strchr(S_start, 'S');
+    if (!S_end) S_end = strchr(S_start, 's');   // medida anti case sensitive
+    if (!S_end) return;
+
+    
+    size_t S_size = (size_t)(S_end - S_start);
+    if (S_size >= sizeof(dado_c->coord_S))    // medida anti overflow
+        S_size = sizeof(dado_c->coord_S) - 1;
+
+    // copia coordenada S
+    strncpy(dado_c->coord_S, S_start, S_size);  // usa os ponteiros como delimitadores para copiar o tamanho exato da coordenada
+    dado_c->coord_S[S_size] = '\0';
+    remove_espaco(dado_c->coord_S);
+
+    // --- W ---
+    char *W_start = S_end + 1;    // as coordenadas de W vem logo após o 'S'
+    remove_espaco(W_start);
+
+    // acha o primeiro dígito (início da coordenada W)
+    while (*W_start && !isdigit((unsigned char)*W_start)) W_start++;
+    if (!*W_start) return;
+
+    char *W_end = strchr(W_start, 'W');
+    if (!W_end) W_end = strchr(W_start, 'w');   // medida anti case sensitive
+    if (!W_end) return;
+
+    size_t W_size = (size_t)(W_end - W_start);
+    if (W_size >= sizeof(dado_c->coord_W))    // medida anti overflow
+        W_size = sizeof(dado_c->coord_W) - 1;
+
+    // copia coordenada W
+    strncpy(dado_c->coord_W, W_start, W_size);  // usa os ponteiros como delimitadores para copiar o tamanho exato da coordenada
+    dado_c->coord_W[W_size] = '\0';
+    remove_espaco(dado_c->coord_W);
 }
 //-------------------------------------------------------------------------//
 
@@ -149,7 +190,8 @@ void parser_txt(char *local, dado_excel *out)
     safe_copy(out->conf_fundo, sizeof(out->conf_fundo), "não encontrado");
     safe_copy(out->conf_latEsq, sizeof(out->conf_latEsq), "não encontrado");
     safe_copy(out->conf_latDir, sizeof(out->conf_latDir), "não encontrado");
-    safe_copy(out->coords, sizeof(out->coords), "não encontrado");
+    safe_copy(out->coord_S, sizeof(out->coord_S), "não encontrado");    // --nova variavel
+    safe_copy(out->coord_W, sizeof(out->coord_W), "não encontrado");    // --nova variavel
     safe_copy(out->area_tot, sizeof(out->area_tot), "não encontrado");
     safe_copy(out->area_usada, sizeof(out->area_usada), "não encontrado");
     safe_copy(out->conserv_state, sizeof(out->conserv_state), "não encontrado");
@@ -164,7 +206,7 @@ void parser_txt(char *local, dado_excel *out)
         if (strstr(line, "LOCALIZAÇÃO:"))
         {
             char *p = dps_doispontos(line);
-            if (p) extrai_dados_localizacao(p, out);    // --Safe_Copy substítuido por função extrai dadoteste               
+            if (p) extrai_dados_localizacao(p, out);    // --Safe_Copy substítuido por função extrai dados localização              
         }
         else if (strstr(line, "Mesorregião"))
         {
@@ -204,7 +246,7 @@ void parser_txt(char *local, dado_excel *out)
         else if (strstr(line, "COORDENADAS:"))
         {
             char *p = dps_doispontos(line);
-            if (p) safe_copy(out->coords, sizeof(out->coords), p);
+            if (p) extrai_coordenadas(p, out);  // --Safe_Copy substítuido por função extrai coordenadas
         }
         else if (strstr(line, "Área do Terreno:"))
         {
