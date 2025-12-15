@@ -53,6 +53,9 @@ static void on_button_clicked(GtkButton *button, gpointer user_data)
         NULL
     );
 
+    gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dialog), TRUE);
+
+
     GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, "PDF");
     gtk_file_filter_add_pattern(filter, "*.pdf");
