@@ -30,7 +30,8 @@ bool criar_excel(const char *caminho, const Dadostxt *dado)
     worksheet_write_string(sheet, 0, collumn++, "Fundo:", NULL);
     worksheet_write_string(sheet, 0, collumn++, "Lateral Esquerda:", NULL);
     worksheet_write_string(sheet, 0, collumn++, "Lateral Direita:", NULL);
-    worksheet_write_string(sheet, 0, collumn++, "Coordenadas:", NULL);
+    worksheet_write_string(sheet, 0, collumn++, "Coordenada W:", NULL);
+    worksheet_write_string(sheet, 0, collumn++, "Coordenada S:", NULL);
     worksheet_write_string(sheet, 0, collumn++, "Área Total:", NULL);
     worksheet_write_string(sheet, 0, collumn++, "Área Construída:", NULL);
     worksheet_write_string(sheet, 0, collumn++, "Estado de Conservação:", NULL);
@@ -49,7 +50,8 @@ bool criar_excel(const char *caminho, const Dadostxt *dado)
     worksheet_write_string(sheet, row, collumn++, dado->conf_fundo, NULL);
     worksheet_write_string(sheet, row, collumn++, dado->conf_latEsq, NULL);
     worksheet_write_string(sheet, row, collumn++, dado->conf_latDir, NULL);
-    worksheet_write_string(sheet, row, collumn++, dado->coords, NULL);
+    worksheet_write_string(sheet, row, collumn++, dado->coord_W, NULL);
+    worksheet_write_string(sheet, row, collumn++, dado->coord_S, NULL);
     worksheet_write_string(sheet, row, collumn++, dado->area_tot, NULL);
     worksheet_write_string(sheet, row, collumn++, dado->area_usada, NULL);
     worksheet_write_string(sheet, row, collumn++, dado->conserv_state, NULL);

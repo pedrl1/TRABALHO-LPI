@@ -21,7 +21,8 @@ void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados)
         "Confrontante Fundo: %s\n" 
         "Confrontante Lat. Esq: %s\n"
         "Confrontante Lat. Dir: %s\n"
-        "Coordenadas Geográficas: %s\n"
+        "Coordenadas W: %s\n"
+        "Coordenadas S: %s\n"
         "Área total: %s\n"
         "Área construída: %s\n"
         "Estado de conservação: %s\n"
@@ -29,7 +30,7 @@ void update_textview_with_laudo(GtkTextView *textview, const Dadostxt *dados)
         "Data da valoração: %s\n"
         "CP Nº: %s\n",
         dados->endereco, dados->numero, dados->cidade, dados->estado, dados->regiao, dados->conf_frente, dados->conf_fundo,
-        dados->conf_latEsq, dados->conf_latDir, dados->coords,
+        dados->conf_latEsq, dados->conf_latDir, dados->coord_W, dados->coord_S,
         dados->area_tot, dados->area_usada, dados->conserv_state,
         dados->valoracao, dados->data_valoracao, dados->CPNo
     );

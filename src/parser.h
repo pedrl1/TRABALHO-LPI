@@ -12,7 +12,8 @@ typedef struct DadosTxt
     char conf_fundo [256];
     char conf_latEsq [256];
     char conf_latDir [256];
-    char coords [64];
+    char coord_W [64];
+    char coord_S [64];
     char area_tot [32];
     char area_usada [32];
     char conserv_state [32];
